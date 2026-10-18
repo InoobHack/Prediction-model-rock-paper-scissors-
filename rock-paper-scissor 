@@ -1,0 +1,128 @@
+
+
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+int main() {
+    int rock = 0, scissors = 0, paper = 0;
+
+    // Load saved memory
+    ifstream inputFile("memory.txt");
+
+    if (inputFile >> rock >> scissors >> paper) {
+        cout << "Welcome back! I remember your moves.\n";
+    } else {
+        cout << "Let's train the AI with 5 moves!\n";
+
+        for (int i = 0; i < 5; i++) {
+            int move;
+
+            cout << "Enter move (0=Rock, 1=Scissors, 2=Paper): ";
+
+            while (!(cin >> move) || move < 0 || move > 2) {
+                cout << "Invalid! Enter 0, 1, or 2: ";
+                cin.clear();
+                cin.ignore(10000, '\n');
+            }
+
+            if (move == 0) {
+                rock++;
+            } else if (move == 1) {
+                scissors++;
+            } else {
+                paper++;
+            }
+        }
+    }
+
+    inputFile.close();
+
+    string names[] = {"Rock", "Scissors", "Paper"};
+
+    while (true) {
+        int predict;
+
+        // Predict the most common move
+        if (rock >= scissors && rock >= paper) {
+            predict = 0;
+        } else if (scissors >= paper) {
+            predict = 1;
+        } else {
+            predict = 2;
+        }
+
+        // Choose the move that beats the prediction
+        int computer;
+
+        if (predict == 0) {
+            computer = 2;
+        } else if (predict == 1) {
+            computer = 0;
+        } else {
+            computer = 1;
+        }
+
+        int actual;
+
+        cout << "\nLet's play Rock, Paper, Scissors!\n";
+        cout << "Enter your move (0=Rock, 1=Scissors, 2=Paper): ";
+
+        while (!(cin >> actual) || actual < 0 || actual > 2) {
+            cout << "Invalid! Enter 0, 1, or 2: ";
+            cin.clear();
+            cin.ignore(10000, '\n');
+        }
+
+        char reveal;
+        cout << "Press y to reveal my prediction: ";
+        cin >> reveal;
+
+        while (reveal != 'y' && reveal != 'Y') {
+            cout << "Press y to reveal my prediction: ";
+            cin >> reveal;
+        }
+
+        cout << "\nI predicted: " << names[predict] << endl;
+        cout << "I chose: " << names[computer] << endl;
+        cout << "You played: " << names[actual] << endl;
+
+        if (actual == predict) {
+            cout << "My prediction was correct!\n";
+        } else {
+            cout << "My prediction was wrong!\n";
+        }
+
+        // Learn from the actual move
+        if (actual == 0) {
+            rock++;
+        } else if (actual == 1) {
+            scissors++;
+        } else {
+            paper++;
+        }
+
+        // Save the updated counts
+        ofstream outputFile("memory.txt");
+
+        if (outputFile.is_open()) {
+            outputFile << rock << " "
+                       << scissors << " "
+                       << paper << endl;
+
+            outputFile.close();
+            cout << "Memory saved!\n";
+        } else {
+            cout << "Could not save memory!\n";
+        }
+
+        cout << "Current counts: Rock=" << rock
+             << ", Scissors=" << scissors
+             << ", Paper=" << paper << endl;
+
+        cout << "Play another round, or stop the program to quit.\n";
+    }
+
+    return 0;
+}
